@@ -291,3 +291,31 @@ O repositório retorna `None` quando não encontra uma figurinha. Quem transform
 No update usei `PUT` como substituição completa dos campos editáveis. Por isso `numero`, `tipo` e `posicao` seguem obrigatórios na atualização.
 
 O formato dos erros de domínio é `{"error": "..."}`. FastAPI normalmente usa `detail`, mas o handler devolve `JSONResponse` para manter o retorno pedido.
+
+## Indo Alem
+
+### Abrir Pacotinho
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/pacotinho" -Method Get
+```
+
+Esse endpoint cria uma figurinha aleatória e já salva no banco.
+
+Resposta:
+
+```json
+{
+  "mensagem": "Veio uma brilhante.",
+  "figurinha": {
+    "id": 1,
+    "numero": "BRA 15",
+    "tipo": "brilhante",
+    "posicao": "Atacante",
+    "created_at": "2026-06-03T14:30:00+00:00",
+    "updated_at": "2026-06-03T14:30:00+00:00"
+  }
+}
+```
+
+O `/pacotinho` entrou como um pequeno extra. A geração aleatória e a mensagem ficam no service pois são regras do pacote. O repository continua só salvando e buscando dados no SQLite.

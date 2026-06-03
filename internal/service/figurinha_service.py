@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
@@ -77,6 +78,13 @@ class FigurinhaService:
         if not removed:
             raise ErrFigureNotFound()
 
+    def open_pack(self) -> Dict:
+        figurinha = self.create(self._random_figurinha_data())
+        return {
+            "mensagem": self._pack_message(figurinha.tipo),
+            "figurinha": figurinha.to_dict(),
+        }
+
     def _validate_required_fields(self, data: Dict) -> None:
         for field in ("numero", "tipo", "posicao"):
             value = data.get(field)
@@ -95,6 +103,34 @@ class FigurinhaService:
         for field in ("id", "created_at", "updated_at"):
             if field in data:
                 raise ErrReadOnlyField(field)
+
+    def _random_figurinha_data(self) -> Dict:
+        country = random.choice(("BRA", "ARG", "FRA", "ESP", "POR", "URU", "ITA", "GER"))
+        number = random.randint(1, 26)
+        tipo = random.choices(
+            population=("comum", "brilhante", "legends_bronze", "legends_ouro"),
+            weights=(70, 20, 8, 2),
+            k=1,
+        )[0]
+        posicao = random.choice(("Goleiro", "Zagueiro", "Meio-campista", "Atacante"))
+
+        return {
+            "numero": f"{country} {number:02d}",
+            "tipo": tipo,
+            "posicao": posicao,
+        }
+
+    def _pack_message(self, tipo: str) -> str:
+        if tipo == "legends_ouro":
+            return "Achou uma legends ouro, vende :)"
+
+        if tipo == "legends_bronze":
+            return "Veio legends bronze."
+
+        if tipo == "brilhante":
+            return "Veio uma brilhante."
+
+        return "Veio uma comum."
 
     def _now(self) -> datetime:
         return datetime.now(timezone.utc).replace(microsecond=0)

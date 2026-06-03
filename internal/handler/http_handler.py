@@ -65,6 +65,10 @@ def build_app(service) -> FastAPI:
         except DomainError as error:
             return _domain_error_response(error)
 
+    @app.get("/pacotinho")
+    async def open_pack():
+        return service.open_pack()
+
     return app
 
 

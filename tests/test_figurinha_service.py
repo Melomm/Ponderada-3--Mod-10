@@ -2,6 +2,7 @@ import sqlite3
 import unittest
 
 from internal.database.sqlite import migrate
+from internal.domain.figurinha import VALID_POSITIONS, VALID_TYPES
 from internal.errors.errors import ErrFigureNotFound, ErrInvalidType, ErrMissingField
 from internal.repository.sqlite_figurinha_repository import SQLiteFigurinhaRepository
 from internal.service.figurinha_service import FigurinhaService
@@ -50,6 +51,25 @@ class FigurinhaServiceTest(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].numero, "ARG 10")
+
+    def test_open_pack_creates_random_figurinha(self):
+        pack = self.service.open_pack()
+        figurinha = pack["figurinha"]
+
+        self.assertEqual(figurinha["id"], 1)
+        self.assertIn(figurinha["tipo"], VALID_TYPES)
+        self.assertIn(figurinha["posicao"], VALID_POSITIONS)
+        self.assertTrue(figurinha["numero"])
+        self.assertEqual(len(self.service.list()), 1)
+
+    def test_open_pack_creates_one_figurinha_per_call(self):
+        self.service.open_pack()
+        self.service.open_pack()
+
+        self.assertEqual(len(self.service.list()), 2)
+
+    def test_pack_message_for_legends_ouro(self):
+        self.assertIn("legends ouro", self.service._pack_message("legends_ouro"))
 
 
 if __name__ == "__main__":
